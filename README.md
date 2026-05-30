@@ -1,43 +1,48 @@
 # Arrington Annotation Tool (AAT)
 
-**Modular, fast, AI-assisted YOLO annotation for computer vision datasets.**
+**Modular, fast, AI-assisted YOLO annotation.**
 
-[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
-Use a pretrained model (`.pt`, `.engine`, or `.onnx`) to automatically generate high-quality YOLO detection labels, then review, correct, and refine them with a powerful desktop viewer that has **built-in AI suggestions**.
+Use a pretrained model (`.pt`, `.engine`, or `.onnx`) to automatically generate high-quality detection labels, then review, correct, and refine them with an excellent desktop viewer that has built-in model suggestions.
 
 ## Quick Start
 
-```bash
+```powershell
 pip install "arrington-annotation-tool[ultralytics]"
 
-# Generate labels from a strong model
-aat generate --model yolov8n.pt --images ./raw-images --out ./my-dataset --conf 0.2
+# 1. Bootstrap labels from a strong pretrained model
+aat generate --model yolov8n.pt --images C:\data\raw --out C:\data\labeled --conf 0.2
 
-# Launch the viewer with live AI Assist
+# 2. Launch the modern GUI (recommended)
+aat gui
+
+# Or launch the classic powerful viewer
 aat view
 ```
 
-In the viewer, use the **AI Assist panel** to load any model and get instant suggestions on any image.
+## Two Interfaces (Both First-Class)
 
-## Features
+### Modern GUI (`aat gui` / `aat-gui`)
+- Built with CustomTkinter
+- Clean modern look with Light/Dark/System themes
+- Integrated dataset generation + easy access to the viewer
 
-- **Engine → Dataset**: One command turns images + a model into a ready-to-train YOLO detection dataset (with confidence metadata).
-- **Live AI in Viewer**: The same engines power "Suggest" buttons directly in the annotation canvas.
-- **Fully Modular**: `import aat` gives you clean, testable primitives.
-- **Detect-first with extensibility**: Strong foundation for bounding boxes today, clean path to OBB and segmentation.
+### Classic Viewer (`aat view` / `aat-viewer`)
+- Full-featured Tkinter viewer
+- Advanced editing (auto-trace segmentation, etc.)
+- Very powerful for detailed work
+
+Both are equally important and actively maintained.
 
 ## Installation
 
 ```bash
-# Core
-pip install arrington-annotation-tool
-
-# Recommended (for running models)
+# Recommended for most users
 pip install "arrington-annotation-tool[ultralytics]"
 
-# Full features
+# With modern GUI
+pip install "arrington-annotation-tool[gui]"
+
+# Everything
 pip install "arrington-annotation-tool[all]"
 ```
 
@@ -45,12 +50,13 @@ pip install "arrington-annotation-tool[all]"
 
 ```bash
 aat --help
+aat gui
 aat generate --model best.pt --images ./raw --out ./dataset
 aat view
 aat info
 ```
 
-## Python API Example
+## Python API
 
 ```python
 from aat import generate_detect_dataset, GenerateConfig, get_engine
@@ -62,25 +68,5 @@ cfg = GenerateConfig(
     confidence=0.15
 )
 result = generate_detect_dataset(cfg)
-print(f"Labeled {result.processed} images")
+print(result.processed, "images labeled")
 ```
-
-## Project Goals
-
-- Best-in-class local tool for bootstrapping and refining YOLO datasets.
-- Make AI assistance a delightful, first-class part of manual annotation.
-- Stay small, well-tested, and reusable as a Python library.
-
-## Development
-
-```bash
-git clone https://github.com/NANOBYTECOMPUTERS/-arrington-annotation-tool.git
-cd -arrington-annotation-tool
-pip install -e ".[ultralytics,test]"
-pytest
-aat --help
-```
-
-## License
-
-MIT
