@@ -15,11 +15,22 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Determine release notes
+        id: notes
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          NOTES_FILE="RELEASES/${TAG}.md"
+          if [ -f "$NOTES_FILE" ]; then
+            echo "body_path=$NOTES_FILE" >> $GITHUB_OUTPUT
+            echo "Using custom release notes from $NOTES_FILE"
+          else
+            echo "Using auto-generated release notes"
+          fi
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
           draft: false
-          prerelease: false
-          # You can also point to a specific file for release body:
-          # body_path: RELEASES/${{ github.ref_name }}.md
+          prerelease: ${{ contains(github.ref, '-rc') || contains(github.ref, '-beta') || contains(github.ref, '-alpha') }}
+          body_path: ${{ steps.notes.outputs.body_path }}
