@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "arrington-annotation-tool"
+version = "0.2.0"
+description = "Arrington Annotation Tool (AAT) — modular library and desktop app for fast AI-assisted YOLO annotation"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+  {name = "Arrington Annotation Tool Contributors"}
+]
+requires-python = ">=3.11"
+dependencies = [
+  "Pillow>=10.3",
+  "numpy>=1.26",
+  "PyYAML>=6.0",
+  "opencv-python>=4.9"
+]
+
+[project.optional-dependencies]
+ultralytics = ["ultralytics>=8.2"]
+refine = ["torch>=2.3"]
+test = ["pytest>=8.2"]
+all = ["arrington-annotation-tool[ultralytics,refine]"]
+
+[project.scripts]
+aat = "aat.cli:main"
+aat-generate = "aat.generate:main"
+aat-viewer = "aat.viewer:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+aat = ["*.py"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-q"
+
+[project.urls]
+Homepage = "https://github.com/NANOBYTECOMPUTERS/-arrington-annotation-tool"
+Repository = "https://github.com/NANOBYTECOMPUTERS/-arrington-annotation-tool"
+Issues = "https://github.com/NANOBYTECOMPUTERS/-arrington-annotation-tool/issues"
