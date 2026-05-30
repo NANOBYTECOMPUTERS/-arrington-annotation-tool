@@ -12,11 +12,24 @@ authors = [
   {name = "Arrington Annotation Tool Contributors"}
 ]
 requires-python = ">=3.11"
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Scientific/Engineering :: Image Processing",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+keywords = ["yolo", "annotation", "computer-vision", "object-detection", "machine-learning", "ultralytics"]
 dependencies = [
   "Pillow>=10.3",
   "numpy>=1.26",
   "PyYAML>=6.0",
-  "opencv-python>=4.9"
+  "opencv-python>=4.9",
 ]
 
 [project.optional-dependencies]
@@ -45,3 +58,4 @@ addopts = "-q"
 Homepage = "https://github.com/NANOBYTECOMPUTERS/-arrington-annotation-tool"
 Repository = "https://github.com/NANOBYTECOMPUTERS/-arrington-annotation-tool"
 Issues = "https://github.com/NANOBYTECOMPUTERS/-arrington-annotation-tool/issues"
+Changelog = "https://github.com/NANOBYTECOMPUTERS/-arrington-annotation-tool/blob/main/CHANGELOG.md"
