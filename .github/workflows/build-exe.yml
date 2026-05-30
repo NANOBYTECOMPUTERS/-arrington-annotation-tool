@@ -27,7 +27,7 @@ jobs:
           pyinstaller --onefile --windowed --name "AAT-Viewer" src/aat/viewer.py
 
       - name: Upload executable artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: AAT-Viewer-Windows
           path: dist/AAT-Viewer.exe
