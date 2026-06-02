@@ -1,0 +1,54 @@
+Metadata-Version: 2.4
+Name: arrington-annotation-tool-gui
+Version: 0.2.0
+Summary: Arrington Annotation Tool (AAT) GUI - detect annotation with C++ inference backend
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: Pillow>=10.3
+Requires-Dist: customtkinter>=5.2
+Provides-Extra: dev
+Requires-Dist: pyinstaller; extra == "dev"
+
+# Arrington Annotation Tool (AAT) - GUI
+
+This is a clean, self-contained project for building the **Arrington Annotation Tool GUI**.
+
+It uses a modern CustomTkinter interface + talks to an external C++ inference worker (TensorRT backend) via NDJSON.
+
+## Build
+
+Run:
+
+```powershell
+.\build.ps1
+```
+
+Output will be in `./build/Arrington Annotation Tool/`
+
+This folder is a complete, runnable onedir application (GUI + the full C++ TensorRT inference engine/worker + its DLLs). You only supply the .engine model and your dataset.
+
+## Running the built app
+
+1. Take the entire `build/Arrington Annotation Tool/` folder.
+2. Run `Arrington Annotation Tool.exe`
+3. The worker path should be pre-filled (pointing at the bundled `engine/yolo_annotation_worker.exe`).
+4. Choose your `.engine` model and dataset folders.
+5. Use "Load" and "Suggest Current" (or the auto-annotate flow) for AI-assisted annotation.
+
+## Notes
+
+- `engine/` (at the root of this folder) contains the vendored **pre-built** C++ TensorRT worker + all its required native DLLs. `build.ps1` copies this into the final distributable.
+- `engine-src/` contains the **full C++ source** (`.cpp`, `.cu`, `.vcxproj`, etc.) needed to rebuild or modify the inference engine. See `engine-src/README.md` for build instructions.
+- Only your `.engine` model(s) + image/label dataset are external.
+- On a target machine you may still need a matching CUDA 12.x driver/runtime for full TensorRT operation (the worker will give a clear error if a required system DLL is missing).
+- Heavy Python ML libs (torch, ultralytics, ...) are intentionally excluded — all inference runs in the native worker.
+- Rebuild the full app anytime with `build.ps1` (or `build.bat`) after changing `src/aat/`.
+- To update the vendored engine after modifying/rebuilding from `engine-src/`: copy the new `.exe` + DLLs into `engine/`, then re-run the main build script.
+
+## Development
+
+```powershell
+pip install -e .
+# Then run the GUI directly for fast iteration:
+python tools/aat_viewer_app.py
+```

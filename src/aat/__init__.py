@@ -1,18 +1,13 @@
 """Arrington Annotation Tool (AAT)
 
-A modular, library-first toolkit for AI-assisted YOLO annotation.
+Modular library for AI-assisted YOLO annotation.
+"Use an engine to make a detect dataset, then review & edit with the viewer."
 
-Key capabilities:
-- Use any pretrained model (.pt / .engine / .onnx) to generate YOLO detection datasets
-- High-quality manual review & editing with the AAT Viewer
-- Built-in "Suggest" integration inside the viewer using the same engines
-- Clean, testable, reusable Python package
-
-Example:
+Core public API:
     from aat import generate_detect_dataset, get_engine, AATViewerApp
 """
 
-__version__ = "0.2.0"
+__version__ = "0.2.0-dev"
 
 from aat.config import AATConfig, get_config
 from aat.generate import GenerateConfig, GenerateResult, generate_detect_dataset
@@ -31,3 +26,4 @@ __all__ = [
     "get_engine",
     "AATViewerApp",
 ]
+

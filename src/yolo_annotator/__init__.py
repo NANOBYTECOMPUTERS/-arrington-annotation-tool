@@ -1,0 +1,1 @@
+# Minimal package marker for legacy pieces needed by AAT GUI (worker protocol + classes)

@@ -8,6 +8,18 @@ from pathlib import Path
 
 from aat.io.shapes import IMAGE_EXTENSIONS
 
+# Re-export for convenience
+__all__ = [
+    "DatasetKind",
+    "ImageItem",
+    "ScannedDataset",
+    "scan_dataset",
+    "resolve_label_path",
+    "scan_viewer_images",
+    "guess_label_root",
+    "guess_label_for_image",
+]
+
 
 class DatasetKind(str, Enum):
     PLAIN_FOLDER = "plain_folder"
@@ -44,6 +56,7 @@ def _split_from_yolo_path(root: Path, path: Path) -> str | None:
 
 
 def scan_dataset(root: str | Path) -> ScannedDataset:
+    """Scan a folder for images. Supports flat or standard YOLO images/train + labels/train layout."""
     root_path = Path(root).expanduser().resolve()
     if not root_path.exists():
         raise FileNotFoundError(f"Dataset path does not exist: {root_path}")
@@ -71,17 +84,33 @@ def scan_dataset(root: str | Path) -> ScannedDataset:
     )
 
 
-def resolve_label_path(image_path: Path, *, images_root: Path | None = None, labels_root: Path | None = None) -> Path:
+def resolve_label_path(
+    image_path: Path,
+    *,
+    images_root: Path | None = None,
+    labels_root: Path | None = None,
+) -> Path:
+    """Best-effort resolution of the corresponding YOLO .txt label path for an image.
+
+    Handles common layouts (flat, images/..., images/train/...).
+    """
     img = Path(image_path).expanduser().resolve()
     if labels_root is not None:
         labels_root = Path(labels_root).expanduser().resolve()
+        # Try direct relative
         if images_root is not None:
             try:
                 rel = img.relative_to(Path(images_root).expanduser().resolve())
                 return labels_root / rel.with_suffix(".txt")
             except ValueError:
                 pass
+        # Fallback: same name next to image or in labels/
+        cand = labels_root / img.name
+        if cand.with_suffix(".txt").exists():
+            return cand.with_suffix(".txt")
         return labels_root / img.with_suffix(".txt").name
+
+    # No explicit labels_root — guess beside image or images <-> labels swap
     direct = img.with_suffix(".txt")
     if direct.exists():
         return direct
@@ -89,12 +118,15 @@ def resolve_label_path(image_path: Path, *, images_root: Path | None = None, lab
     for i in range(len(parts) - 1, -1, -1):
         if parts[i].lower() == "images":
             parts[i] = "labels"
-            return Path(*parts).with_suffix(".txt")
+            cand = Path(*parts).with_suffix(".txt")
+            return cand
     return direct
 
 
-# Viewer / annotation helpers (modular, extracted)
+# --- Viewer / annotation tool helpers (extracted for modularity) ---
+
 def scan_viewer_images(image_root: str | Path) -> list[Path]:
+    """Scan a folder recursively for supported image files."""
     root = Path(image_root).expanduser().resolve()
     if not root.is_dir():
         raise NotADirectoryError(f"Image folder not found: {root}")
@@ -102,6 +134,7 @@ def scan_viewer_images(image_root: str | Path) -> list[Path]:
 
 
 def guess_label_root(image_root: Path) -> Path | None:
+    """Best-effort guess for the sibling 'labels' folder given an images folder."""
     root = image_root.expanduser().resolve()
     if root.name.lower() == "images" and (root.parent / "labels").is_dir():
         return root.parent / "labels"
@@ -115,6 +148,7 @@ def guess_label_root(image_root: Path) -> Path | None:
 
 
 def guess_label_for_image(image_path: Path) -> Path | None:
+    """Best-effort guess for the corresponding .txt label file for a given image."""
     image = image_path.expanduser().resolve()
     direct = image.with_suffix(".txt")
     if direct.exists():

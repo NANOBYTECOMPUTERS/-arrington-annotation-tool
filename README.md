@@ -1,72 +1,43 @@
-# Arrington Annotation Tool (AAT)
+# Arrington Annotation Tool (AAT) - GUI
 
-**Modular, fast, AI-assisted YOLO annotation.**
+This is a clean, self-contained project for building the **Arrington Annotation Tool GUI**.
 
-Use a pretrained model (`.pt`, `.engine`, or `.onnx`) to automatically generate high-quality detection labels, then review, correct, and refine them with an excellent desktop viewer that has built-in model suggestions.
+It uses a modern CustomTkinter interface + talks to an external C++ inference worker (TensorRT backend) via NDJSON.
 
-## Quick Start
+## Build
+
+Run:
 
 ```powershell
-pip install "arrington-annotation-tool[ultralytics]"
-
-# 1. Bootstrap labels from a strong pretrained model
-aat generate --model yolov8n.pt --images C:\data\raw --out C:\data\labeled --conf 0.2
-
-# 2. Launch the modern GUI (recommended)
-aat gui
-
-# Or launch the classic powerful viewer
-aat view
+.\build.ps1
 ```
 
-## Two Interfaces (Both First-Class)
+Output will be in `./build/Arrington Annotation Tool/`
 
-### Modern GUI (`aat gui` / `aat-gui`)
-- Built with CustomTkinter
-- Clean modern look with Light/Dark/System themes
-- Integrated dataset generation + easy access to the viewer
+This folder is a complete, runnable onedir application (GUI + the full C++ TensorRT inference engine/worker + its DLLs). You only supply the .engine model and your dataset.
 
-### Classic Viewer (`aat view` / `aat-viewer`)
-- Full-featured Tkinter viewer
-- Advanced editing (auto-trace segmentation, etc.)
-- Very powerful for detailed work
+## Running the built app
 
-Both are equally important and actively maintained.
+1. Take the entire `build/Arrington Annotation Tool/` folder.
+2. Run `Arrington Annotation Tool.exe`
+3. The worker path should be pre-filled (pointing at the bundled `engine/yolo_annotation_worker.exe`).
+4. Choose your `.engine` model and dataset folders.
+5. Use "Load" and "Suggest Current" (or the auto-annotate flow) for AI-assisted annotation.
 
-## Installation
+## Notes
 
-```bash
-# Recommended for most users
-pip install "arrington-annotation-tool[ultralytics]"
+- `engine/` (at the root of this folder) contains the vendored **pre-built** C++ TensorRT worker + all its required native DLLs. `build.ps1` copies this into the final distributable.
+- `engine-src/` contains the **full C++ source** (`.cpp`, `.cu`, `.vcxproj`, etc.) needed to rebuild or modify the inference engine. See `engine-src/README.md` for build instructions.
+- Only your `.engine` model(s) + image/label dataset are external.
+- On a target machine you may still need a matching CUDA 12.x driver/runtime for full TensorRT operation (the worker will give a clear error if a required system DLL is missing).
+- Heavy Python ML libs (torch, ultralytics, ...) are intentionally excluded — all inference runs in the native worker.
+- Rebuild the full app anytime with `build.ps1` (or `build.bat`) after changing `src/aat/`.
+- To update the vendored engine after modifying/rebuilding from `engine-src/`: copy the new `.exe` + DLLs into `engine/`, then re-run the main build script.
 
-# With modern GUI
-pip install "arrington-annotation-tool[gui]"
+## Development
 
-# Everything
-pip install "arrington-annotation-tool[all]"
-```
-
-## CLI
-
-```bash
-aat --help
-aat gui
-aat generate --model best.pt --images ./raw --out ./dataset
-aat view
-aat info
-```
-
-## Python API
-
-```python
-from aat import generate_detect_dataset, GenerateConfig, get_engine
-
-cfg = GenerateConfig(
-    images_root="raw-photos",
-    model_path="best.pt",
-    output_root="my-yolo-dataset",
-    confidence=0.15
-)
-result = generate_detect_dataset(cfg)
-print(result.processed, "images labeled")
+```powershell
+pip install -e .
+# Then run the GUI directly for fast iteration:
+python tools/aat_viewer_app.py
 ```

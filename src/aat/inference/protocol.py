@@ -1,4 +1,7 @@
-"""Protocol and data types for detection engines in AAT."""
+"""Protocol and data types for detection engines.
+
+Any object satisfying DetectionEngine can be used by generate_detect_dataset.
+"""
 
 from __future__ import annotations
 
@@ -14,11 +17,12 @@ class EngineConfig:
     confidence: float = 0.25
     iou: float = 0.45
     imgsz: int | None = None
-    device: str | None = None
+    device: str | None = None  # "cpu", "0", "cuda:0", etc.
 
 
 @dataclass
 class Prediction:
+    """Per-image prediction result (used internally by generators)."""
     image_path: Path
     boxes: list[DetectionBox]
     width: int
@@ -28,7 +32,20 @@ class Prediction:
 
 @runtime_checkable
 class DetectionEngine(Protocol):
-    @property
-    def names(self) -> list[str]: ...
+    """Protocol for anything that can produce detections from images."""
 
-    def predict(self, images, *, conf=None, iou=None, **kwargs) -> list[Prediction]: ...
+    @property
+    def names(self) -> list[str]:
+        """Class names in order (index == class_id)."""
+        ...
+
+    def predict(
+        self,
+        images: Path | list[Path],
+        *,
+        conf: float | None = None,
+        iou: float | None = None,
+        **kwargs: object,
+    ) -> list[Prediction]:
+        """Run inference. Must return one Prediction per input image (in order)."""
+        ...
